@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quiz Online</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= THEME ================= */
+:root{
+  --bg:#0b1220;
+  --bg2:#111a2e;
+  --card:rgba(255,255,255,.08);
+  --text:#eaf0ff;
+  --muted:#a8b3cf;
+  --stroke:rgba(255,255,255,.12);
+  --accent:#7c3aed;
+  --shadow: 0 25px 70px rgba(0,0,0,.45);
+  --radius: 18px;
+}
+
+body.light{
+  --bg:#f4f7ff;
+  --bg2:#e9efff;
+  --card:rgba(255,255,255,.96);
+  --text:#111827;
+  --muted:#6b7280;
+  --stroke:#e5e7eb;
+  --accent:#4f46e5;
+  --shadow: 0 18px 50px rgba(17,24,39,.12);
+}
+
+/* ================= BASE ================= */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(180deg,var(--bg),var(--bg2));
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+section{animation: fade .18s ease}
+@keyframes fade{
+  from{opacity:0; transform: translateY(6px)}
+  to{opacity:1; transform: translateY(0)}
+}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:28px 15px 60px;
+}
+
+.hide{display:none!important}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--stroke);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+
+/* ================= HEADER ================= */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+  padding:12px 14px;
+  border-radius:var(--radius);
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.10);
+}
+body.light .header{background:rgba(255,255,255,.55)}
+
+.logo{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:.2px;
+}
+.themeBtn{
+  cursor:pointer;
+  border-radius:12px;
+  padding:8px 12px;
+  border:1px solid var(--stroke);
+  background:transparent;
+  color:var(--text);
+}
+.themeBtn:hover{filter:brightness(1.06)}
+
+/* ================= FORMS ================= */
+label{margin-top:10px;display:block;font-size:.92rem}
+input{
+  width:100%;
+  padding:11px 12px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  background:transparent;
+  color:var(--text);
+  outline:none;
+}
+input:focus{
+  border-color: rgba(124,58,237,.55);
+  box-shadow: 0 0 0 4px rgba(124,58,237,.18);
+}
+
+.btn{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);
+  cursor:pointer;
+  background:linear-gradient(90deg, rgba(124,58,237,.85), rgba(79,70,229,.85));
+  color:white;
+  font-weight:600;
+  transition:.15s ease;
+}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+
+.btn.secondary{
+  background:transparent;
+  color:var(--text);
+  border:1px solid var(--stroke);
+}
+.btn.small{padding:7px 10px;border-radius:10px;font-size:.9rem}
+
+/* ================= TABS ================= */
+.tabs{
+  margin-top:14px;
+  display:flex;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.12);
+  width:max-content;
+}
+.tab{
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  user-select:none;
+  color:var(--muted);
+  transition:.2s ease;
+}
+.tab.active{
+  color:var(--text);
+  background:linear-gradient(90deg, rgba(124,58,237,.55), rgba(59,130,246,.40));
+  border:1px solid rgba(255,255,255,.12);
+}
+
+/* ================= TOP BAR (Quiz/Admin) ================= */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  border:1px solid var(--stroke);
+  border-radius:var(--radius);
+  background:rgba(0,0,0,.10);
+  margin-bottom:12px;
+}
+body.light .top{background:rgba(255,255,255,.55)}
+.pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.12);
+}
+body.light .pill{background:rgba(255,255,255,.65)}
+.timer{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px dashed rgba(168,179,207,.55);
+}
+
+/* ================= QUIZ ================= */
+#list{margin-top:14px}
+.q{
+  margin-top:12px;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.10);
+}
+body.light .q{background:rgba(255,255,255,.55)}
+.q h3{margin:0 0 10px;font-size:1rem}
+.opts{display:grid;gap:10px}
+.opt{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  cursor:pointer;
+  background:rgba(0,0,0,.08);
+}
+body.light .opt{background:rgba(255,255,255,.55)}
+.opt:hover{background:rgba(124,58,237,.12)}
+.opt input{margin-top:3px;width:auto}
+
+/* ================= TABLE ================= */
+.tableWrap{
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  margin-top:12px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width: 920px;
+}
+th, td{
+  padding:12px 10px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  text-align:left;
+  font-size:.92rem;
+}
+body.light th, body.light td{border-bottom:1px solid #e5e7eb}
+thead th{
+  position:sticky;
+  top:0;
+  background:rgba(15,23,42,.85);
+  z-index:1;
+}
+body.light thead th{background:#f3f4f6;color:#111827}
+tbody tr:hover{background:rgba(124,58,237,.10)}
+
+/* ================= BADGES ================= */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:.86rem;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.10);
+}
+.badge.good{border-color: rgba(34,197,94,.45); background: rgba(34,197,94,.12)}
+.badge.bad{border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.12)}
+.badge.empty{border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.12)}
+
+.detailGrid{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+.detailItem{
+  border:1px solid var(--stroke);
+  border-radius:14px;
+  padding:14px;
+  background:rgba(0,0,0,.10);
+}
+body.light .detailItem{background:rgba(255,255,255,.6)}
+
+@media (max-width: 860px){
+  .top{flex-direction:column; align-items:flex-start}
+  .detailGrid{grid-template-columns:1fr}
+  table{min-width:720px}
+}
+
+/* ================= Leaderboard ================= */
+.lb{
+  margin-top:14px;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,.10);
+}
+body.light .lb{background:rgba(255,255,255,.6)}
+.lb h3{margin:0 0 10px}
+.lb ol{margin:0; padding-left:18px}
+.lb li{margin:6px 0}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">🎓 QUIZ MIQDAD GANTENG GADA OBAT</div>
+    <button class="themeBtn" id="themeToggle">🌙 Mode</button>
+  </div>
+
+  <!-- LOGIN / REGISTER -->
+  <section id="auth" class="card">
+    <h1 style="margin:0 0 8px;">SELAMAT DATANG DAN SEMOGA LANCAR</h1>
+    <p class="muted" style="margin:0 0 12px;">Register dulu anjing kalau belum bikin akun</p>
+
+    <div class="tabs">
+      <div class="tab active" id="tabLogin">Login</div>
+      <div class="tab" id="tabRegister">Register</div>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginBox" style="margin-top:10px;">
+      <label>Username</label>
+      <input id="loginUser" type="text" placeholder="" autocomplete="username" />
+
+      <label>Password</label>
+      <input id="loginPass" type="password" placeholder="" autocomplete="current-password" />
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn" id="btnLogin">Masuk</button>
+      </div>
+
+      <div class="muted" id="authMsg" style="margin-top:10px;"></div>
+
+      <div class="lb" id="lbBox">
+        <h3>🏆 Leaderboard (Top 10)</h3>
+        <div class="muted" style="margin-top:-6px;">Diambil dari skor tertinggi yang tersimpan di perangkat ini.</div>
+        <ol id="lb"></ol>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerBox" class="hide" style="margin-top:10px;">
+      <label>Nama Lengkap</label>
+      <input id="regName" type="text" placeholder="" />
+
+      <label>Kelas</label>
+      <input id="regClass" type="text" placeholder="" />
+
+      <label>Username</label>
+      <input id="regUser" type="text" placeholder="" autocomplete="username" />
+
+      <label>Password</label>
+      <input id="regPass" type="password" placeholder="" autocomplete="new-password" />
+
+      <label>Konfirmasi Password</label>
+      <input id="regPass2" type="password" placeholder="" autocomplete="new-password" />
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn" id="btnRegister">Buat Akun</button>
+        <button class="btn secondary" id="btnToLogin">Saya sudah punya akun</button>
+      </div>
+
+      <div class="muted" id="regMsg" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="hide">
+    <div class="top">
+      <div class="pill">👤 <b id="who">-</b> <span class="muted" id="whoMeta"></span></div>
+      <div class="timer">Sisa waktu: <b id="time">--:--</b></div>
+      <div class="row">
+        <button class="btn secondary" id="logout">Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px;">Quiz 25 Soal</h2>
+      <div class="muted">Timer 20 menit. Soal diacak per user. Auto-submit saat habis.</div>
+
+      <div id="list"></div>
+
+      <div class="row" style="margin-top:14px;">
+        <button class="btn" id="submit">Submit</button>
+        <span class="muted" id="msg"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THANK YOU -->
+  <section id="thanks" class="hide">
+    <div class="card" style="text-align:center;padding:28px 18px">
+      <h1 style="margin:0 0 8px;">✅ Terima kasih!</h1>
+      <p>Terima kasih telah mengikuti quiz ini.</p>
+
+      <div class="lb" style="text-align:left">
+        <h3>🏆 Leaderboard (Top 10)</h3>
+        <ol id="lb2"></ol>
+      </div>
+
+      <div class="row" style="justify-content:center; margin-top:16px;">
+        <button class="btn secondary" id="backLogin">Kembali ke Login</button>
+      </div>
+
+      <p class="muted" style="margin-top:14px;">*Jawaban kamu sudah tersimpan.</p>
+    </div>
+  </section>
+
+  <!-- ADMIN -->
+  <section id="admin" class="hide">
+    <div class="top">
+      <div class="pill">👑 Admin</div>
+      <div class="row">
+        <button class="btn secondary" id="exportCsv">Export CSV</button>
+        <button class="btn secondary" id="refresh">Refresh</button>
+        <button class="btn secondary" id="clear">Hapus Semua Hasil</button>
+        <button class="btn secondary" id="logout2">Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px;">Rekap Hasil Siswa</h2>
+      <div class="muted">Klik <b>Detail</b> untuk lihat indikator benar/salah per nomor.</div>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nama Lengkap</th>
+              <th>Kelas</th>
+              <th>Username</th>
+              <th>Waktu</th>
+              <th>Durasi(s)</th>
+              <th>Skor</th>
+              <th>Nilai</th>
+              <th>B/S/K</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tb"></tbody>
+        </table>
+      </div>
+
+      <!-- DETAIL -->
+      <div id="detailWrap" class="hide" style="margin-top:14px;">
+        <div class="row" style="justify-content:space-between;">
+          <div class="pill">📄 Detail Jawaban: <b id="detailName">-</b> <span class="muted" id="detailMeta"></span></div>
+          <button class="btn secondary small" id="closeDetail">Tutup Detail</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <span class="badge good">✅ Benar</span>
+          <span class="badge bad">❌ Salah</span>
+          <span class="badge empty">⭕ Kosong</span>
+        </div>
+
+        <div id="detailGrid" class="detailGrid"></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ================= THEME TOGGLE ================= */
+const body = document.body;
+const themeBtn = document.getElementById("themeToggle");
+if(localStorage.getItem("theme")==="light") body.classList.add("light");
+themeBtn.onclick = () => {
+  body.classList.toggle("light");
+  localStorage.setItem("theme", body.classList.contains("light") ? "light" : "dark");
+};
+
+/* ================= CONFIG ================= */
+const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwktO3pshSQFDJTit3gKPpUMriSn3kSHyf8stVrr_0T9KVM3LlqBW7WM7dik9hK7FlhFg/exec";
+
+const QUESTIONS = [
+  { q: "HTML kepanjangan dari ...", opts:["HyperText Markup Language","HighText Machine Language","Hyperlink and Text Markup Language","Home Tool Markup Language"], key:0 },
+  { q: "Tag untuk judul terbesar adalah ...", opts:["<h6>","<head>","<h1>","<title>"], key:2 },
+  { q: "Tag untuk membuat paragraf adalah ...", opts:["<p>","<br>","<div>","<span>"], key:0 },
+  { q: "CSS digunakan untuk ...", opts:["Membuat database","Mengatur tampilan","Menjalankan server","Membuat email"], key:1 },
+  { q: "Selector CSS untuk class adalah ...", opts:["#nama",".nama","@nama","$nama"], key:1 },
+  { q: "Selector CSS untuk id adalah ...", opts:["#nama",".nama","&nama","*nama"], key:0 },
+  { q: "Properti CSS untuk warna teks adalah ...", opts:["background","color","font-style","border"], key:1 },
+  { q: "Properti CSS untuk ukuran teks adalah ...", opts:["font-size","text-size","size-font","font-weight"], key:0 },
+  { q: "Tag untuk membuat link adalah ...", opts:["<a>","<link>","<href>","<url>"], key:0 },
+  { q: "Atribut untuk membuka link di tab baru ...", opts:["open='new'","target='_blank'","newtab='true'","blank='1'"], key:1 },
+  { q: "Tag untuk gambar adalah ...", opts:["<image>","<img>","<pic>","<src>"], key:1 },
+  { q: "Atribut untuk alamat gambar adalah ...", opts:["href","src","link","path"], key:1 },
+  { q: "Elemen block yang umum dipakai sebagai wadah adalah ...", opts:["<span>","<div>","<em>","<b>"], key:1 },
+  { q: "Elemen inline yang umum untuk teks pendek ...", opts:["<div>","<section>","<span>","<article>"], key:2 },
+  { q: "Tag untuk list bernomor adalah ...", opts:["<ul>","<ol>","<li>","<dl>"], key:1 },
+  { q: "Tag untuk list tidak bernomor adalah ...", opts:["<ul>","<ol>","<li>","<dl>"], key:0 },
+  { q: "Atribut input untuk tipe password ...", opts:["type='text'","type='pass'","type='password'","type='secure'"], key:2 },
+  { q: "Properti CSS untuk jarak dalam elemen ...", opts:["margin","padding","gap","border"], key:1 },
+  { q: "Properti CSS untuk jarak luar elemen ...", opts:["margin","padding","outline","gap"], key:0 },
+  { q: "Flexbox diaktifkan dengan ...", opts:["display: block","display: flex","display: grid","position: flex"], key:1 },
+  { q: "Grid diaktifkan dengan ...", opts:["display: grid","display: table","display: inline","grid: on"], key:0 },
+  { q: "Properti CSS untuk membuat sudut membulat ...", opts:["border-round","radius","border-radius","round-corner"], key:2 },
+  { q: "Tag untuk komentar di HTML ...", opts:["// komentar","<!-- komentar -->","** komentar **","## komentar"], key:1 },
+  { q: "File ekstensi CSS biasanya ...", opts:[".html",".css",".js",".png"], key:1 },
+  { q: "File ekstensi JavaScript biasanya ...", opts:[".html",".css",".js",".json"], key:2 },
+];
+
+const USERS_KEY    = "quiz_users_demo_v2";
+const ATTEMPTS_KEY = "quiz_attempts_demo_v2";
+
+const DURATION = 20 * 60;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const optHTML = (opt) => (String(opt).includes("<") ? `<code>${esc(opt)}</code>` : esc(opt));
+
+const loadUsers = () => { try{return JSON.parse(localStorage.getItem(USERS_KEY)||"[]")}catch(e){return []} };
+const saveUsers = (arr) => localStorage.setItem(USERS_KEY, JSON.stringify(arr));
+const loadAttempts = () => { try{return JSON.parse(localStorage.getItem(ATTEMPTS_KEY)||"[]")}catch(e){return []} };
+const saveAttempts = (arr) => localStorage.setItem(ATTEMPTS_KEY, JSON.stringify(arr));
+
+/* ================= STATE ================= */
+let currentUser = null; // {username,fullName,kelas}
+let isAdmin = false;
+
+let answers = new Array(QUESTIONS.length).fill(null);
+let order = [];              // urutan soal (shuffle)
+let startedAt = 0;
+let remain = DURATION;
+let timer = null;
+let submitted = false;
+
+/* ================= UI ================= */
+function show(which){
+  $("auth").classList.add("hide");
+  $("quiz").classList.add("hide");
+  $("admin").classList.add("hide");
+  $("thanks").classList.add("hide");
+  $(which).classList.remove("hide");
+  $("detailWrap")?.classList.add("hide");
+  if($("detailGrid")) $("detailGrid").innerHTML = "";
+}
+
+/* ================= TABS ================= */
+function setTab(tab){
+  if(tab === "login"){
+    $("tabLogin").classList.add("active");
+    $("tabRegister").classList.remove("active");
+    $("loginBox").classList.remove("hide");
+    $("registerBox").classList.add("hide");
+  }else{
+    $("tabRegister").classList.add("active");
+    $("tabLogin").classList.remove("active");
+    $("registerBox").classList.remove("hide");
+    $("loginBox").classList.add("hide");
+  }
+  $("authMsg").textContent = "";
+  $("regMsg").textContent = "";
+}
+$("tabLogin").onclick = () => setTab("login");
+$("tabRegister").onclick = () => setTab("register");
+$("btnToLogin").onclick = () => setTab("login");
+
+/* ================= REGISTER ================= */
+$("btnRegister").onclick = () => {
+  const fullName = $("regName").value.trim();
+  const kelas = $("regClass").value.trim();
+  const u = $("regUser").value.trim();
+  const p1 = $("regPass").value;
+  const p2 = $("regPass2").value;
+
+  if(!fullName || !kelas || !u || !p1 || !p2) return $("regMsg").textContent = "Semua field wajib diisi.";
+  if(u.toLowerCase() === "admin") return $("regMsg").textContent = "Username 'admin' tidak boleh dipakai.";
+  if(p1.length < 4) return $("regMsg").textContent = "Password minimal 4 karakter.";
+  if(p1 !== p2) return $("regMsg").textContent = "Password & konfirmasi tidak sama.";
+
+  const users = loadUsers();
+  const exists = users.some(x => x.username.toLowerCase() === u.toLowerCase());
+  if(exists) return $("regMsg").textContent = "Username sudah terdaftar. Silakan login.";
+
+  users.push({ username:u, password:p1, fullName, kelas, createdAt:new Date().toISOString() });
+  saveUsers(users);
+
+  $("regMsg").textContent = "Akun berhasil dibuat ✅ Silakan login.";
+  $("regName").value = "";
+  $("regClass").value = "";
+  $("regUser").value = "";
+  $("regPass").value = "";
+  $("regPass2").value = "";
+
+  setTab("login");
+  $("loginUser").value = u;
+  $("loginPass").value = "";
+};
+
+/* ================= LOGIN ================= */
+$("btnLogin").onclick = () => {
+  const u = $("loginUser").value.trim();
+  const p = $("loginPass").value;
+
+  if(!u || !p) return $("authMsg").textContent = "Isi username & password dulu.";
+
+  // ADMIN
+  if(u === "admin" && p === "admin123"){
+    currentUser = { username:"admin", fullName:"Admin", kelas:"-" };
+    isAdmin = true;
+    show("admin");
+    renderAdmin();
+    return;
+  }
+
+  // SISWA
+  const users = loadUsers();
+  const found = users.find(x => x.username.toLowerCase() === u.toLowerCase());
+  if(!found) return $("authMsg").textContent = "Akun belum terdaftar. Silakan Register dulu.";
+  if(found.password !== p) return $("authMsg").textContent = "Password salah.";
+
+  currentUser = { username: found.username, fullName: found.fullName, kelas: found.kelas };
+  isAdmin = false;
+  startQuiz();
+};
+
+/* ================= RANDOM ORDER PER USER ================= */
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildOrderForUser(){
+  // random urutan soal setiap mulai quiz
+  const idx = Array.from({length: QUESTIONS.length}, (_,i)=>i);
+  return shuffleArray(idx);
+}
+
+/* ================= QUIZ ================= */
+function startQuiz(){
+  $("who").textContent = currentUser.fullName;
+  $("whoMeta").textContent = `• ${currentUser.kelas} • @${currentUser.username}`;
+  show("quiz");
+
+  submitted = false;
+  answers = new Array(QUESTIONS.length).fill(null);
+  startedAt = Date.now();
+  remain = DURATION;
+
+  order = buildOrderForUser();
+  renderQuiz();
+  startTimer();
+  $("msg").textContent = "";
+  $("submit").disabled = false;
+}
+
+function renderQuiz(){
+  $("list").innerHTML = "";
+
+  // Render berdasarkan order acak
+  order.forEach((qIndex, viewIndex) => {
+    const it = QUESTIONS[qIndex];
+    const box = document.createElement("div");
+    box.className = "q";
+    box.innerHTML = `
+      <h3>${viewIndex+1}. ${esc(it.q)}</h3>
+      <div class="opts">
+        ${it.opts.map((o, idx)=>`
+          <label class="opt">
+            <input type="radio" name="q_${qIndex}" value="${idx}">
+            <span><b>${String.fromCharCode(65+idx)}.</b> ${optHTML(o)}</span>
+          </label>
+        `).join("")}
+      </div>
+    `;
+    box.addEventListener("change", (e) => {
+      answers[qIndex] = Number(e.target.value); // simpan ke index asli
+    });
+    $("list").appendChild(box);
+  });
+}
+
+function calc(){
+  let correct=0, wrong=0, empty=0;
+  QUESTIONS.forEach((q,i)=>{
+    const a = answers[i];
+    if(a===null || Number.isNaN(a)) empty++;
+    else if(a===q.key) correct++;
+    else wrong++;
+  });
+  return {score: correct, total: QUESTIONS.length, correct, wrong, empty};
+}
+
+/* ================= TIMER ================= */
+function startTimer(){
+  if(timer) clearInterval(timer);
+  tick();
+  timer = setInterval(()=>{
+    remain--;
+    tick();
+    if(remain <= 0){
+      clearInterval(timer);
+      $("time").textContent = "00:00";
+      submit(true);
+    }
+  },1000);
+}
+function tick(){
+  const m = String(Math.floor(remain/60)).padStart(2,"0");
+  const s = String(remain%60).padStart(2,"0");
+  $("time").textContent = `${m}:${s}`;
+}
+
+function showThanks(){ show("thanks"); }
+
+/* ================= SUBMIT ================= */
+function submit(auto=false){
+  if(submitted) return;
+  submitted = true;
+  $("submit").disabled = true;
+
+  const endedAt = Date.now();
+  const durationSec = Math.floor((endedAt-startedAt)/1000);
+  const r = calc();
+  const nilai = Math.round((r.score / r.total) * 100);
+
+  // Simpan lokal
+  const attempts = loadAttempts();
+  attempts.push({
+    username: currentUser.username,
+    fullName: currentUser.fullName,
+    kelas: currentUser.kelas,
+    timeISO: new Date().toISOString(),
+    durationSec,
+    ...r,
+    nilai,
+    answers,
+    order // simpan urutan juga (biar admin bisa baca urutan tampilan)
+  });
+  saveAttempts(attempts);
+
+  // Kirim ke Google Sheet (rekap saja)
+  const payload = {
+    nama: currentUser.fullName,
+    kelas: currentUser.kelas,
+    username: currentUser.username,
+    skor: r.score,
+    benar: r.correct,
+    salah: r.wrong,
+    kosong: r.empty,
+    waktu_submit: new Date().toISOString(),
+    nilai: nilai
+  };
+
+  fetch(SHEET_API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  }).catch(()=>{});
+
+  // update leaderboard di thanks
+  renderLeaderboard("lb2");
+  showThanks();
+}
+$("submit").onclick = () => submit(false);
+
+/* ================= ADMIN ================= */
+function renderAdmin(){
+  const attempts = loadAttempts().slice().reverse();
+  const tb = $("tb");
+  tb.innerHTML = "";
+
+  if(attempts.length === 0){
+    tb.innerHTML = `<tr><td colspan="10" class="muted">Belum ada data.</td></tr>`;
+    return;
+  }
+
+  attempts.forEach((a, idx)=>{
+    const time = new Date(a.timeISO).toLocaleString("id-ID", {dateStyle:"medium", timeStyle:"short"});
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${idx+1}</td>
+      <td><b>${esc(a.fullName || "-")}</b></td>
+      <td>${esc(a.kelas || "-")}</td>
+      <td>@${esc(a.username || "-")}</td>
+      <td>${esc(time)}</td>
+      <td>${a.durationSec ?? ""}</td>
+      <td><b>${(a.score ?? 0)}/${(a.total ?? QUESTIONS.length)}</b></td>
+      <td><b>${a.nilai ?? ""}</b></td>
+      <td>${a.correct ?? 0}/${a.wrong ?? 0}/${a.empty ?? 0}</td>
+      <td><button class="btn secondary small" data-detail="${idx}">Detail</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+
+  tb.querySelectorAll("button[data-detail]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const indexFromTop = Number(btn.getAttribute("data-detail"));
+      const attempt = attempts[indexFromTop];
+      renderDetail(attempt);
+    });
+  });
+}
+
+function renderDetail(attempt){
+  $("detailName").textContent = attempt.fullName || attempt.username || "-";
+  $("detailMeta").textContent = `• ${attempt.kelas || "-"} • @${attempt.username || "-"}`;
+  $("detailWrap").classList.remove("hide");
+
+  const grid = $("detailGrid");
+  grid.innerHTML = "";
+
+  (attempt.answers || []).forEach((ans, i)=>{
+    const q = QUESTIONS[i];
+    const key = q.key;
+
+    let badge = `<span class="badge empty">⭕ Kosong</span>`;
+    let userText = "<span class='muted'>-</span>";
+
+    if(ans === null || Number.isNaN(ans)){
+      // kosong
+    } else if(ans === key){
+      badge = `<span class="badge good">✅ Benar</span>`;
+      userText = `<span class="mono"><b>${String.fromCharCode(65+ans)}.</b> ${esc(q.opts[ans])}</span>`;
+    } else {
+      badge = `<span class="badge bad">❌ Salah</span>`;
+      userText = `<span class="mono"><b>${String.fromCharCode(65+ans)}.</b> ${esc(q.opts[ans])}</span>`;
+    }
+
+    const keyText = `<span class="mono"><b>${String.fromCharCode(65+key)}.</b> ${esc(q.opts[key])}</span>`;
+
+    const item = document.createElement("div");
+    item.className = "detailItem";
+    item.innerHTML = `
+      <div class="row" style="justify-content:space-between;">
+        <div class="pill">Soal #${i+1}</div>
+        ${badge}
+      </div>
+      <div style="margin-top:10px;"><b>${esc(q.q)}</b></div>
+      <div class="muted" style="margin-top:10px;">Jawaban Siswa:</div>
+      <div style="margin-top:4px;">${userText}</div>
+      <div class="muted" style="margin-top:10px;">Kunci Jawaban:</div>
+      <div style="margin-top:4px;">${keyText}</div>
+    `;
+    grid.appendChild(item);
+  });
+
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+$("closeDetail").onclick = () => {
+  $("detailWrap").classList.add("hide");
+  $("detailGrid").innerHTML = "";
+};
+
+$("refresh").onclick = renderAdmin;
+
+$("clear").onclick = () => {
+  if(confirm("Hapus semua data hasil quiz?")){
+    localStorage.removeItem(ATTEMPTS_KEY);
+    renderAdmin();
+    $("detailWrap").classList.add("hide");
+    $("detailGrid").innerHTML = "";
+  }
+};
+
+/* ================= EXPORT CSV ================= */
+function csvEscape(val){
+  const s = String(val ?? "");
+  return `"${s.replaceAll('"','""')}"`;
+}
+
+$("exportCsv").onclick = () => {
+  const attempts = loadAttempts();
+  if(attempts.length === 0){
+    alert("Belum ada data untuk diexport.");
+    return;
+  }
+
+  const headers = [
+    "Nama Lengkap","Kelas","Username","Waktu","Durasi (detik)","Skor","Total","Benar","Salah","Kosong","Nilai","Jawaban (index opsi 0-3)"
+  ];
+
+  const rows = attempts.map(a => {
+    const time = new Date(a.timeISO).toLocaleString("id-ID", {dateStyle:"medium", timeStyle:"short"});
+    const ansStr = (a.answers || []).map(x => (x===null || Number.isNaN(x)) ? "" : x).join("|");
+    return [
+      a.fullName || "",
+      a.kelas || "",
+      a.username || "",
+      time,
+      a.durationSec ?? "",
+      a.score ?? "",
+      a.total ?? QUESTIONS.length,
+      a.correct ?? "",
+      a.wrong ?? "",
+      a.empty ?? "",
+      a.nilai ?? "",
+      ansStr
+    ];
+  });
+
+  const csv = [
+    headers.map(csvEscape).join(","),
+    ...rows.map(r => r.map(csvEscape).join(","))
+  ].join("\r\n");
+
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  const stamp = new Date().toISOString().slice(0,19).replaceAll(":","-");
+  a.download = `hasil-quiz-${stamp}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+};
+
+/* ================= LEADERBOARD =================
+   - Ambil skor tertinggi per username
+   - Urutkan nilai desc, kalau sama: durasi lebih cepat menang
+*/
+function getLeaderboardTop10(){
+  const attempts = loadAttempts();
+  const bestByUser = new Map();
+
+  for(const a of attempts){
+    const key = (a.username || "").toLowerCase();
+    if(!key) continue;
+
+    const prev = bestByUser.get(key);
+    if(!prev){
+      bestByUser.set(key, a);
+      continue;
+    }
+    // bandingkan lebih baik:
+    const prevNilai = Number(prev.nilai ?? 0);
+    const curNilai  = Number(a.nilai ?? 0);
+
+    if(curNilai > prevNilai) bestByUser.set(key, a);
+    else if(curNilai === prevNilai){
+      // tie-break: durasi lebih cepat
+      const prevDur = Number(prev.durationSec ?? 999999);
+      const curDur  = Number(a.durationSec ?? 999999);
+      if(curDur < prevDur) bestByUser.set(key, a);
+    }
+  }
+
+  const list = Array.from(bestByUser.values());
+  list.sort((a,b)=>{
+    const an = Number(a.nilai ?? 0), bn = Number(b.nilai ?? 0);
+    if(bn !== an) return bn - an;
+    return Number(a.durationSec ?? 999999) - Number(b.durationSec ?? 999999);
+  });
+
+  return list.slice(0,10);
+}
+
+function renderLeaderboard(targetId){
+  const ol = $(targetId);
+  if(!ol) return;
+  const top = getLeaderboardTop10();
+  ol.innerHTML = "";
+
+  if(top.length === 0){
+    ol.innerHTML = `<li class="muted">Belum ada data.</li>`;
+    return;
+  }
+
+  top.forEach((a, i)=>{
+    const name = a.fullName || a.username || "-";
+    const kelas = a.kelas || "-";
+    const nilai = a.nilai ?? 0;
+    const dur = a.durationSec ?? "-";
+    const li = document.createElement("li");
+    li.innerHTML = `<b>#${i+1}</b> ${esc(name)} <span class="muted">(${esc(kelas)})</span> — <b>${nilai}</b> <span class="muted">(${dur}s)</span>`;
+    ol.appendChild(li);
+  });
+}
+
+/* ================= LOGOUT ================= */
+function doLogout(){
+  if(timer) clearInterval(timer);
+  currentUser = null;
+  isAdmin = false;
+
+  $("loginUser").value = "";
+  $("loginPass").value = "";
+  $("regName").value = "";
+  $("regClass").value = "";
+  $("regUser").value = "";
+  $("regPass").value = "";
+  $("regPass2").value = "";
+
+  show("auth");
+  setTab("login");
+  renderLeaderboard("lb");
+}
+
+$("logout").onclick = doLogout;
+$("logout2").onclick = doLogout;
+$("backLogin").onclick = doLogout;
+
+/* ================= INIT ================= */
+show("auth");
+setTab("login");
+renderLeaderboard("lb");
+</script>
+</body>
+</html>
